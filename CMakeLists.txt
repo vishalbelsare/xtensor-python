@@ -7,7 +7,7 @@
 # The full license is in the file LICENSE, distributed with this software. #
 ############################################################################
 
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.29)
 project(xtensor-python)
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
@@ -25,14 +25,14 @@ foreach(ver ${xtensor_python_version_defines})
         set(XTENSOR_PYTHON_VERSION_${CMAKE_MATCH_1} "${CMAKE_MATCH_2}" CACHE INTERNAL "")
     endif()
 endforeach()
-set(${PROJECT_NAME}_VERSION 
+set(${PROJECT_NAME}_VERSION
     ${XTENSOR_PYTHON_VERSION_MAJOR}.${XTENSOR_PYTHON_VERSION_MINOR}.${XTENSOR_PYTHON_VERSION_PATCH})
 message(STATUS "xtensor-python v${${PROJECT_NAME}_VERSION}")
 
 # Dependencies
 # ============
 
-set(xtensor_REQUIRED_VERSION 0.24.0)
+set(xtensor_REQUIRED_VERSION 0.27.0)
 if(TARGET xtensor)
     set(xtensor_VERSION ${XTENSOR_VERSION_MAJOR}.${XTENSOR_VERSION_MINOR}.${XTENSOR_VERSION_PATCH})
     # Note: This is not SEMVER compatible comparison
@@ -45,17 +45,27 @@ else()
     find_package(xtensor ${xtensor_REQUIRED_VERSION} REQUIRED)
     message(STATUS "Found xtensor: ${xtensor_INCLUDE_DIRS}/xtensor")
 endif()
-    
-# Currently no required version for pybind11
-if(TARGET pybind11 OR TARGET pybind11::headers)
+
+find_package(Python COMPONENTS Interpreter REQUIRED)
+
+set(pybind11_REQUIRED_VERSION 3.0.0)
+if (NOT TARGET pybind11::headers)
+    # Defaults to ON for cmake >= 3.18
+    # https://github.com/pybind/pybind11/blob/35ff42b56e9d34d9a944266eb25f2c899dbdfed7/CMakeLists.txt#L96
+    set(PYBIND11_FINDPYTHON OFF)
+    find_package(pybind11 ${pybind11_REQUIRED_VERSION} REQUIRED)
+    message(STATUS "Found pybind11: ${pybind11_INCLUDE_DIRS}/pybind11")
+else ()
     # pybind11 has a variable that indicates its version already, so use that
     message(STATUS "Found pybind11 v${pybind11_VERSION}")
-else()
-    find_package(pybind11 REQUIRED)
-    message(STATUS "Found pybind11: ${pybind11_INCLUDE_DIRS}/pybind11")
-endif()
+endif ()
 
-find_package(NumPy REQUIRED)
+# Look for NumPy headers, except if NUMPY_INCLUDE_DIRS is passed,
+# which is required under some circumstances (such as wasm, where
+# there is no real python executable)
+if(NOT NUMPY_INCLUDE_DIRS)
+    find_package(NumPy REQUIRED)
+endif()
 message(STATUS "Found numpy: ${NUMPY_INCLUDE_DIRS}")
 
 # Build
@@ -114,7 +124,14 @@ export(EXPORT ${PROJECT_NAME}-targets
 install(FILES ${XTENSOR_PYTHON_HEADERS}
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/xtensor-python)
 
-set(XTENSOR_PYTHON_CMAKECONFIG_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}" CACHE
+
+configure_file(${PROJECT_NAME}.pc.in
+               "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc"
+                @ONLY)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc"
+        DESTINATION "${CMAKE_INSTALL_DATADIR}/pkgconfig/")
+
+set(XTENSOR_PYTHON_CMAKECONFIG_INSTALL_DIR "${CMAKE_INSTALL_DATADIR}/cmake/${PROJECT_NAME}" CACHE
     STRING "install path for xtensor-pythonConfig.cmake")
 
 configure_package_config_file(${PROJECT_NAME}Config.cmake.in

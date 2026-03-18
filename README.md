@@ -1,9 +1,10 @@
 # ![xtensor-python](docs/source/xtensor-python.svg)
 
-[![Azure Pipelines](https://dev.azure.com/xtensor-stack/xtensor-stack/_apis/build/status/xtensor-stack.xtensor-python?branchName=master)](https://dev.azure.com/xtensor-stack/xtensor-stack/_build/latest?definitionId=7&branchName=master)
-[![Appveyor](https://ci.appveyor.com/api/projects/status/4j2yd6k8o5xbimqf?svg=true)](https://ci.appveyor.com/project/xtensor-stack/xtensor-python)
+[![GHA Linux](https://github.com/xtensor-stack/xtensor-python/actions/workflows/linux.yml/badge.svg)](https://github.com/xtensor-stack/xtensor-python/actions/workflows/linux.yml)
+[![GHA OSX](https://github.com/xtensor-stack/xtensor-python/actions/workflows/osx.yml/badge.svg)](https://github.com/xtensor-stack/xtensor-python/actions/workflows/osx.yml)
+[![GHA Windows](https://github.com/xtensor-stack/xtensor-python/actions/workflows/windows.yml/badge.svg)](https://github.com/xtensor-stack/xtensor-python/actions/workflows/windows.yml)
 [![Documentation](http://readthedocs.org/projects/xtensor-python/badge/?version=latest)](https://xtensor-python.readthedocs.io/en/latest/?badge=latest)
-[![Join the Gitter Chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/QuantStack/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Zulip](https://img.shields.io/badge/social_chat-zulip-blue.svg)](https://xtensor.zulipchat.com/#narrow/channel/539553-Ask-anything)
 
 Python bindings for the [xtensor](https://github.com/xtensor-stack/xtensor) C++ multi-dimensional array library.
 
@@ -50,7 +51,7 @@ Both containers enable the numpy-style APIs of xtensor (see [the numpy to xtenso
 ```cpp
 #include <numeric>                        // Standard library import for std::accumulate
 #include <pybind11/pybind11.h>            // Pybind11 import to define Python bindings
-#include <xtensor/xmath.hpp>              // xtensor import for the C++ universal functions
+#include <xtensor/core/xmath.hpp>              // xtensor import for the C++ universal functions
 #define FORCE_IMPORT_ARRAY
 #include <xtensor-python/pyarray.hpp>     // Numpy bindings
 
@@ -203,7 +204,10 @@ from the `docs` subdirectory.
 
 | `xtensor-python` | `xtensor` |  `pybind11`      |
 |------------------|-----------|------------------|
-| master           |  ^0.24.0  | ~2.4.3           |
+| master           |  ^0.27.0  | >=2.6.1,<4       |
+| 0.29.0           |  ^0.27.0  | >=2.6.1,<4       |
+| 0.28.0           |  ^0.26.0  | >=2.6.1,<3       |
+| 0.27.0           |  ^0.25.0  | >=2.6.1,<3       |
 | 0.26.1           |  ^0.24.0  | ~2.4.3           |
 | 0.26.0           |  ^0.24.0  | ~2.4.3           |
 | 0.25.3           |  ^0.23.0  | ~2.4.3           |
